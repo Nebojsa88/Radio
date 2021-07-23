@@ -46,8 +46,9 @@ public class MainActivity extends AppCompatActivity{
     private MusicAdapter adapter;
     private int source;
 
-    boolean isPrevious = false;
-    boolean isNext = false;
+    private MyService myService = new MyService();
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,16 +85,19 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
 
-                if(isMyServiceRunning(MyService.class)){
+                /*if(isMyServiceRunning(MyService.class)){
                     stopService();
-                }
+                }*/
                 position = MusicAdapter.TEST_POSITION;
 
                 //textRadioName.setText(radioList.get(position).getName());
-                isPrevious = true;
-                Intent serviceIntent = new Intent(MainActivity.this, MyService.class);
+
+
+
+                myService.prepareMediaPlayerPrevious();
+                /*Intent serviceIntent = new Intent(MainActivity.this, MyService.class);
                 serviceIntent.putExtra("isPrevious", isPrevious);
-                ContextCompat.startForegroundService(MainActivity.this, serviceIntent);
+                ContextCompat.startForegroundService(MainActivity.this, serviceIntent);*/
 
             }
         });
@@ -101,17 +105,15 @@ public class MainActivity extends AppCompatActivity{
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if(isMyServiceRunning(MyService.class)){
-                    stopService();
-                }
                 position = MusicAdapter.TEST_POSITION;
+                /*if(isMyServiceRunning(MyService.class)){
+                    stopService();
+                }*/
 
+                position = MusicAdapter.TEST_POSITION;
+                myService.prepareMediaPlayerNext();
                 //textRadioName.setText(radioList.get(position).getName());
-                isNext = true;
-                Intent serviceIntent = new Intent(MainActivity.this, MyService.class);
-                serviceIntent.putExtra("isNext", isNext);
-                ContextCompat.startForegroundService(MainActivity.this, serviceIntent);
+
 
             }
         });

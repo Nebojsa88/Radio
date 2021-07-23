@@ -26,6 +26,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
     private Context mContext;
     private String radioName;
     public static int TEST_POSITION;
+    private boolean serviceStarted;
 
     public MusicAdapter(ArrayList<RadioStation> list, Context mContext) {
         this.radioStations = list;
@@ -47,37 +48,25 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
             @Override
             public void onClick(View v) {
 
-                if (isMyServiceRunning(MyService.class)){
-                    // Boolean isStarted = started;
-                    Intent serviceIntent = new Intent(mContext, MyService.class);
-                    //serviceIntent.putExtra("isStarted", isStarted);
-                    mContext.stopService(serviceIntent);
-                }
-                TEST_POSITION = position;
-
-                Intent serviceIntent = new Intent(mContext, MyService.class);
-                String urlPosition;
-                urlPosition = radioStations.get(position).getUrl();
-                radioName = radioStations.get(position).getName();
-
-                serviceIntent.putExtra("url", urlPosition);
-                serviceIntent.putExtra("positionName", radioName);
-                serviceIntent.putExtra("position", position);
-                ContextCompat.startForegroundService(mContext, serviceIntent);
-
-
-                Intent intent = new Intent("send_radio_name");
-                // You can also include some extra data.
-                intent.putExtra("radioPosition", position);
-
-                LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
-
-
                 View root = v.getRootView();
-                TextView name = root.findViewById(R.id.textRadioName);
+                    TextView name = root.findViewById(R.id.textRadioName);
+                    name.setText(radioStations.get(position).getName());
 
-                name.setText(radioName);
+                TEST_POSITION = position;
+                MyService myService = new MyService();
+                if (isMyServiceRunning(MyService.class)){
 
+                    myService.prepareMediaPlayerPosition();
+                    /*Intent intent = new Intent("send_radio_name");
+                    // You can also include some extra data.
+                    intent.putExtra("radioPosition", position);
+
+                    LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);*/
+                    serviceStarted = false;
+                }else {
+                    startForegroundService(position);
+                    serviceStarted = true;
+                }
             }
         });
         /*String filePath = list.get(position);
@@ -99,6 +88,19 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
             }
         });*/
     }
+
+    private void startForegroundService(int position) {
+        Intent serviceIntent = new Intent(mContext, MyService.class);
+        String urlPosition;
+        urlPosition = radioStations.get(position).getUrl();
+        radioName = radioStations.get(position).getName();
+
+        serviceIntent.putExtra("url", urlPosition);
+        serviceIntent.putExtra("positionName", radioName);
+        serviceIntent.putExtra("position", position);
+        ContextCompat.startForegroundService(mContext, serviceIntent);
+    }
+
     @Override
     public int getItemCount() {
         return radioStations.size();

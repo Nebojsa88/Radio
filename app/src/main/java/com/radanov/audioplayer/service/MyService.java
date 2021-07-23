@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Build;
@@ -34,12 +35,12 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 public class MyService extends Service {
 
     private final ArrayList<RadioStation> radioList = new ArrayList<>();
-    private MediaPlayer mediaPlayer = new MediaPlayer();
+    private StreamMediaPlayer mediaPlayer = StreamMediaPlayer.getInstance();
     private boolean prepared = false;
     private boolean started = false;
     private String filePath;
     private int source;
-    Context context ;
+    Context context;
     private String url;
     private String radioName;
     int position;
@@ -54,6 +55,7 @@ public class MyService extends Service {
         inputRadioStations();
 
     }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
@@ -70,30 +72,7 @@ public class MyService extends Service {
 
         sendMessageToActivity(radioName);
 
-        if (isPrevious){
-
-            if (MusicAdapter.TEST_POSITION == 0){
-                MusicAdapter.TEST_POSITION = radioList.size();
-            }
-
-            MusicAdapter.TEST_POSITION --;
-            String testName = radioList.get(MusicAdapter.TEST_POSITION).getName();
-            sendMessageToActivity(testName);
-            prepareMediaPlayerPrevious();
-
-        }else if(isNext){
-
-            if (MusicAdapter.TEST_POSITION == radioList.size() -1 ){
-                MusicAdapter.TEST_POSITION = -1;
-            }
-            MusicAdapter.TEST_POSITION ++;
-            String testName = radioList.get(MusicAdapter.TEST_POSITION).getName();
-            sendMessageToActivity(testName);
-            prepareMediaPlayerPrevious();
-
-        }else{
-            prepareMediaPlayer();
-        }
+        prepareMediaPlayerPosition();
 
         if (started) {
             started = false;
@@ -121,9 +100,128 @@ public class MyService extends Service {
         return START_STICKY;
     }
 
+    public void prepareMediaPlayerPosition() {
+        if(radioList.size() < 1){
+            inputRadioStations();
+        }
+
+        //mediaPlayer = new MediaPlayer();
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        else
+            mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
+                    .setLegacyStreamType(AudioManager.STREAM_MUSIC)
+                    .build());
+        mediaPlayer.reset();
+
+        //prepareMediaPlayerPrevious();
+        try {
+
+            mediaPlayer.setDataSource(radioList.get(MusicAdapter.TEST_POSITION).getUrl());
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+
+            //buttonPlayPause.setBackgroundResource(R.drawable.pause);
+
+            //String newTitle = newFilePath.substring(newFilePath.lastIndexOf("/")+ 1);
+            //textViewFileNameMusic.setText(newTitle);
+
+            //textViewFileNameMusic.clearAnimation();
+            //textViewFileNameMusic.startAnimation(animation);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    public void prepareMediaPlayerNext() {
+        if(radioList.size() < 1){
+            inputRadioStations();
+        }
+        mediaPlayer = StreamMediaPlayer.getInstance();
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O){
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        }
+        else{
+            mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
+                    .setLegacyStreamType(AudioManager.STREAM_MUSIC)
+                    .build());
+        }
+        mediaPlayer.reset();
+
+        if (MusicAdapter.TEST_POSITION == radioList.size() - 1) {
+            MusicAdapter.TEST_POSITION = -1;
+        }
+        MusicAdapter.TEST_POSITION++;
+        String testName = radioList.get(MusicAdapter.TEST_POSITION).getName();
+        sendMessageToActivity(testName);
+        //prepareMediaPlayerPrevious();
+        try {
+
+            mediaPlayer.setDataSource(radioList.get(MusicAdapter.TEST_POSITION).getUrl());
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+
+            //buttonPlayPause.setBackgroundResource(R.drawable.pause);
+
+            //String newTitle = newFilePath.substring(newFilePath.lastIndexOf("/")+ 1);
+            //textViewFileNameMusic.setText(newTitle);
+
+            //textViewFileNameMusic.clearAnimation();
+            //textViewFileNameMusic.startAnimation(animation);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void prepareMediaPlayerPrevious() {
+        if(radioList.size() < 1){
+            inputRadioStations();
+        }
+        mediaPlayer = StreamMediaPlayer.getInstance();
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        else
+            mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
+                    .setLegacyStreamType(AudioManager.STREAM_MUSIC)
+                    .build());
+        mediaPlayer.reset();
+
+
+        if (MusicAdapter.TEST_POSITION == 0) {
+            MusicAdapter.TEST_POSITION = radioList.size();
+        }
+        MusicAdapter.TEST_POSITION--;
+        String testName = radioList.get(MusicAdapter.TEST_POSITION).getName();
+        sendMessageToActivity(testName);
+        //prepareMediaPlayerPrevious();
+        try {
+
+            mediaPlayer.setDataSource(radioList.get(MusicAdapter.TEST_POSITION).getUrl());
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+
+            //buttonPlayPause.setBackgroundResource(R.drawable.pause);
+
+            //String newTitle = newFilePath.substring(newFilePath.lastIndexOf("/")+ 1);
+            //textViewFileNameMusic.setText(newTitle);
+
+            //textViewFileNameMusic.clearAnimation();
+            //textViewFileNameMusic.startAnimation(animation);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     private void createNotificationChannel() {
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
             NotificationChannel notificationChannel = new NotificationChannel(
                     "ChannelID1", "Foreground notification", NotificationManager.IMPORTANCE_DEFAULT);
@@ -133,9 +231,10 @@ public class MyService extends Service {
         }
 
     }
-    public void prepareMediaPlayerPrevious(){
 
-        mediaPlayer = new MediaPlayer();
+    public void prepareMediaPlayerPreviousNext() {
+
+        //mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
         position = MusicAdapter.TEST_POSITION;
@@ -159,6 +258,7 @@ public class MyService extends Service {
             e.printStackTrace();
         }
     }
+
     public void sendMessageToActivity(String msg) {
         Intent intent = new Intent("send_radio_name");
         // You can also include some extra data.
@@ -201,10 +301,15 @@ public class MyService extends Service {
         super.onDestroy();
     }
 
-    public void prepareMediaPlayer(){
 
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+    public void prepareMediaPlayer() {
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        else
+            mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
+                    .setLegacyStreamType(AudioManager.STREAM_MUSIC)
+                    .build());
 
         try {
             mediaPlayer.setDataSource(url);
@@ -215,7 +320,8 @@ public class MyService extends Service {
             e.printStackTrace();
         }
     }
-    public void inputRadioStations(){
+
+    public void inputRadioStations() {
 
         RadioStation radio1 = new RadioStation("Naxi Radio", "https://naxi128.streaming.rs:9152/;*.mp3");
         RadioStation radio2 = new RadioStation("Rock Radio", "https://mastermedia.shoutca.st/proxy/rockradio?mp=/stream");
