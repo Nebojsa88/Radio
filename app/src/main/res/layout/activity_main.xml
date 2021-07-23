@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="@drawable/background_card_view"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/imageViewNote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/note"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="25dp"
+        app:layout_constraintBottom_toTopOf="@+id/textViewRadio"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
+        tools:listitem="@layout/card_music" />
+
+    <TextView
+        android:id="@+id/textViewRadio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Live Radio"
+        android:textColor="@color/black"
+        android:textSize="35sp"
+        app:layout_constraintBottom_toTopOf="@+id/textRadioName"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/recyclerView"
+        />
+
+    <TextView
+        android:id="@+id/textRadioName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:textSize="30sp"
+        android:text="TEST"
+        app:layout_constraintTop_toBottomOf="@+id/textViewRadio"
+        app:layout_constraintBottom_toTopOf="@id/btnLiveMusic"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="10dp"
+        />
+
+
+
+    <Button
+        android:id="@+id/buttonPrevious"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:layout_constraintRight_toLeftOf="@id/btnLiveMusic"
+        app:layout_constraintTop_toTopOf="@id/btnLiveMusic"
+        app:layout_constraintBottom_toBottomOf="@id/btnLiveMusic"
+        android:layout_marginRight="15dp"
+        android:background="@drawable/skip_previous"
+        />
+
+    <Button
+        android:id="@+id/btnLiveMusic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Live Music"
+        app:layout_constraintTop_toBottomOf="@+id/textRadioName"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+    <Button
+        android:id="@+id/buttonNext"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginLeft="15dp"
+        app:layout_constraintLeft_toRightOf="@id/btnLiveMusic"
+        app:layout_constraintTop_toTopOf="@id/btnLiveMusic"
+        app:layout_constraintBottom_toBottomOf="@id/btnLiveMusic"
+        android:background="@drawable/skip_next"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+
+
+
