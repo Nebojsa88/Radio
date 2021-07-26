@@ -36,8 +36,6 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity{
 
-
-
     Context context;
     private int position;
     public static boolean isClickable = true;
@@ -110,15 +108,9 @@ public class MainActivity extends AppCompatActivity{
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                position = MusicAdapter.TEST_POSITION;
-                /*if(isMyServiceRunning(MyService.class)){
-                    stopService();
-                }*/
 
                 position = MusicAdapter.TEST_POSITION;
                 myService.prepareMediaPlayerNext();
-                //textRadioName.setText(radioList.get(position).getName());
-
 
             }
         });
@@ -242,9 +234,11 @@ public class MainActivity extends AppCompatActivity{
         RadioStation radio6 = new RadioStation("Fruska Gora", "https://player.iradio.pro/radiofruskagora/");
         RadioStation radio7 = new RadioStation("Pingvin", "https://uzivo.radiopingvin.com/domaci1");
         RadioStation radio8 = new RadioStation("Radio Zelengrad", "https://usa5.fastcast4u.com/proxy/pddonlcc?mp=/1");
-        RadioStation radio9 = new RadioStation("TDI", "https://streaming.tdiradio.com/tdiradio.mp3");
+        RadioStation radio9 = new RadioStation("TDI", "https://streaming.tdiradio.com/tdiradionovisad.mp3");
         RadioStation radio10 = new RadioStation("Ok Radio", "https://sslstream.okradio.net/;*.mp3");
         RadioStation radio11 = new RadioStation("Radio JAT", "https://streaming.radiojat.rs/radiojat.mp3");
+        RadioStation radio12 = new RadioStation("Cool", "https://live.coolradio.rs/cool128");
+        RadioStation radio13 = new RadioStation("Radio In", "https://radio3-64ssl.streaming.rs:9212/;*.mp3");
 
         radioList.add(radio1);
         radioList.add(radio2);
@@ -257,6 +251,8 @@ public class MainActivity extends AppCompatActivity{
         radioList.add(radio9);
         radioList.add(radio10);
         radioList.add(radio11);
+        radioList.add(radio12);
+        radioList.add(radio13);
 
     }
 

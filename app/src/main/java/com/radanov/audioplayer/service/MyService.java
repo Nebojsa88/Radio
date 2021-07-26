@@ -69,14 +69,14 @@ public class MyService extends Service {
 
         prepareMediaPlayerPosition();
 
-        if (started) {
+        /*if (started) {
             started = false;
             mediaPlayer.pause();
 
         } else {
             started = true;
             mediaPlayer.start();
-        }
+        }*/
 
         Intent intent1 = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent1, 0);
@@ -96,44 +96,33 @@ public class MyService extends Service {
         if(radioList.size() < 1){
             inputRadioStations();
         }
+        mediaPlayer = StreamMediaPlayer.getInstance();
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         }else {
 
-            mediaPlayer = StreamMediaPlayer.getInstance();
             mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
                     .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                     .setUsage(AudioAttributes.USAGE_MEDIA)
                     .build());
-
         }
-
             mediaPlayer.reset();
 
         try {
-
             mediaPlayer.setDataSource(radioList.get(MusicAdapter.TEST_POSITION).getUrl());
             mediaPlayer.prepareAsync();
             mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
                     mediaPlayer.start();
-
                 }
             });
-            //buttonPlayPause.setBackgroundResource(R.drawable.pause);
-
-            //String newTitle = newFilePath.substring(newFilePath.lastIndexOf("/")+ 1);
-            //textViewFileNameMusic.setText(newTitle);
-
-            //textViewFileNameMusic.clearAnimation();
-            //textViewFileNameMusic.startAnimation(animation);
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
         }
-    }
 
+    }
     public void prepareMediaPlayerNext() {
         if(radioList.size() < 1){
             inputRadioStations();
@@ -181,7 +170,6 @@ public class MyService extends Service {
         }
 
     }
-
     public void prepareMediaPlayerPrevious() {
         if(radioList.size() < 1){
             inputRadioStations();
@@ -197,14 +185,13 @@ public class MyService extends Service {
         }
         mediaPlayer.reset();
 
-
         if (MusicAdapter.TEST_POSITION == 0) {
             MusicAdapter.TEST_POSITION = radioList.size();
         }
         MusicAdapter.TEST_POSITION--;
         String testName = radioList.get(MusicAdapter.TEST_POSITION).getName();
         sendMessageToActivity(testName);
-        //prepareMediaPlayerPrevious();
+
         try {
 
             mediaPlayer.setDataSource(radioList.get(MusicAdapter.TEST_POSITION).getUrl());
@@ -339,6 +326,8 @@ public class MyService extends Service {
         RadioStation radio9 = new RadioStation("TDI", "https://streaming.tdiradio.com/tdiradio.mp3");
         RadioStation radio10 = new RadioStation("Ok Radio", "https://sslstream.okradio.net/;*.mp3");
         RadioStation radio11 = new RadioStation("Radio JAT", "https://streaming.radiojat.rs/radiojat.mp3");
+        RadioStation radio12 = new RadioStation("Cool", "https://live.coolradio.rs/cool128");
+        RadioStation radio13 = new RadioStation("Radio In", "https://radio3-64ssl.streaming.rs:9212/;*.mp3");
 
         radioList.add(radio1);
         radioList.add(radio2);
@@ -351,7 +340,8 @@ public class MyService extends Service {
         radioList.add(radio9);
         radioList.add(radio10);
         radioList.add(radio11);
-
+        radioList.add(radio12);
+        radioList.add(radio13);
 
     }
 
