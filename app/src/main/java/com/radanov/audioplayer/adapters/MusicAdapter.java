@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -14,6 +16,7 @@ import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.radanov.audioplayer.MainActivity;
 import com.radanov.audioplayer.R;
 import com.radanov.audioplayer.model.RadioStation;
 import com.radanov.audioplayer.service.MyService;
@@ -47,25 +50,28 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                View root = v.getRootView();
+                if (MainActivity.isClickable) {
+                    View root = v.getRootView();
                     TextView name = root.findViewById(R.id.textRadioName);
                     name.setText(radioStations.get(position).getName());
 
-                TEST_POSITION = position;
-                MyService myService = new MyService();
-                if (isMyServiceRunning(MyService.class)){
+                    TEST_POSITION = position;
+                    MyService myService = new MyService();
 
-                    myService.prepareMediaPlayerPosition();
+                    if (isMyServiceRunning(MyService.class)) {
+                        myService.prepareMediaPlayerPosition();
                     /*Intent intent = new Intent("send_radio_name");
                     // You can also include some extra data.
                     intent.putExtra("radioPosition", position);
 
                     LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);*/
-                    serviceStarted = false;
-                }else {
-                    startForegroundService(position);
-                    serviceStarted = true;
+                        serviceStarted = false;
+                    } else {
+                        startForegroundService(position);
+                        serviceStarted = true;
+                    }
+                }else{
+                    Toast.makeText(mContext, "Please check your internet !", Toast.LENGTH_SHORT).show();
                 }
             }
         });

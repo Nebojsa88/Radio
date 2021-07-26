@@ -2,6 +2,7 @@ package com.radanov.audioplayer;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -17,11 +18,13 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,8 +36,11 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity{
 
+
+
     Context context;
     private int position;
+    public static boolean isClickable = true;
     private TextView textRadioName;
     private String radioName;
     private Button btnLiveMusic;
@@ -48,12 +54,12 @@ public class MainActivity extends AppCompatActivity{
 
     private MyService myService = new MyService();
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        checkTheme();
 
         textRadioName = findViewById(R.id.textRadioName);
 
@@ -79,6 +85,7 @@ public class MainActivity extends AppCompatActivity{
 
         if (!haveNetworkConnection()) {
             btnLiveMusic.setEnabled(false);
+            isClickable = false;
             Toast.makeText(this, "Please check internet connection", Toast.LENGTH_SHORT).show();
         }
         btnPrevious.setOnClickListener(new View.OnClickListener() {
@@ -235,6 +242,9 @@ public class MainActivity extends AppCompatActivity{
         RadioStation radio6 = new RadioStation("Fruska Gora", "https://player.iradio.pro/radiofruskagora/");
         RadioStation radio7 = new RadioStation("Pingvin", "https://uzivo.radiopingvin.com/domaci1");
         RadioStation radio8 = new RadioStation("Radio Zelengrad", "https://usa5.fastcast4u.com/proxy/pddonlcc?mp=/1");
+        RadioStation radio9 = new RadioStation("TDI", "https://streaming.tdiradio.com/tdiradio.mp3");
+        RadioStation radio10 = new RadioStation("Ok Radio", "https://sslstream.okradio.net/;*.mp3");
+        RadioStation radio11 = new RadioStation("Radio JAT", "https://streaming.radiojat.rs/radiojat.mp3");
 
         radioList.add(radio1);
         radioList.add(radio2);
@@ -244,6 +254,10 @@ public class MainActivity extends AppCompatActivity{
         radioList.add(radio6);
         radioList.add(radio7);
         radioList.add(radio8);
+        radioList.add(radio9);
+        radioList.add(radio10);
+        radioList.add(radio11);
+
     }
 
     public void stopService() {
@@ -296,6 +310,14 @@ public class MainActivity extends AppCompatActivity{
                     haveConnectedMobile = true;
         }
         return haveConnectedWifi || haveConnectedMobile;
+    }
+
+    public void checkTheme(){
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        }
     }
 
     @Override

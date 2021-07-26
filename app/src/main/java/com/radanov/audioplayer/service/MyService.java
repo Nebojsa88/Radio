@@ -13,6 +13,8 @@ import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -44,9 +46,6 @@ public class MyService extends Service {
     private String radioName;
     int position;
 
-    private boolean isPrevious = false;
-    private boolean isNext = false;
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -55,7 +54,6 @@ public class MyService extends Service {
             inputRadioStations();
         }
     }
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
@@ -98,23 +96,31 @@ public class MyService extends Service {
         if(radioList.size() < 1){
             inputRadioStations();
         }
-
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        }
-        else{
+        }else {
+
+            mediaPlayer = StreamMediaPlayer.getInstance();
             mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
-                    .setLegacyStreamType(AudioManager.STREAM_MUSIC)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
                     .build());
+
         }
-        mediaPlayer.reset();
+
+            mediaPlayer.reset();
 
         try {
 
             mediaPlayer.setDataSource(radioList.get(MusicAdapter.TEST_POSITION).getUrl());
-            mediaPlayer.prepare();
-            mediaPlayer.start();
+            mediaPlayer.prepareAsync();
+            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    mediaPlayer.start();
 
+                }
+            });
             //buttonPlayPause.setBackgroundResource(R.drawable.pause);
 
             //String newTitle = newFilePath.substring(newFilePath.lastIndexOf("/")+ 1);
@@ -124,6 +130,7 @@ public class MyService extends Service {
             //textViewFileNameMusic.startAnimation(animation);
         } catch (IOException e) {
             e.printStackTrace();
+            Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -137,7 +144,8 @@ public class MyService extends Service {
         }
         else{
             mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
-                    .setLegacyStreamType(AudioManager.STREAM_MUSIC)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
                     .build());
         }
         mediaPlayer.reset();
@@ -152,8 +160,13 @@ public class MyService extends Service {
         try {
 
             mediaPlayer.setDataSource(radioList.get(MusicAdapter.TEST_POSITION).getUrl());
-            mediaPlayer.prepare();
-            mediaPlayer.start();
+            mediaPlayer.prepareAsync();
+            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    mediaPlayer.start();
+                }
+            });
 
             //buttonPlayPause.setBackgroundResource(R.drawable.pause);
 
@@ -174,12 +187,14 @@ public class MyService extends Service {
             inputRadioStations();
         }
         mediaPlayer = StreamMediaPlayer.getInstance();
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        else
+        }else {
             mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
-                    .setLegacyStreamType(AudioManager.STREAM_MUSIC)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
                     .build());
+        }
         mediaPlayer.reset();
 
 
@@ -193,9 +208,13 @@ public class MyService extends Service {
         try {
 
             mediaPlayer.setDataSource(radioList.get(MusicAdapter.TEST_POSITION).getUrl());
-            mediaPlayer.prepare();
-            mediaPlayer.start();
-
+            mediaPlayer.prepareAsync();
+            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    mediaPlayer.start();
+                }
+            });
             //buttonPlayPause.setBackgroundResource(R.drawable.pause);
 
             //String newTitle = newFilePath.substring(newFilePath.lastIndexOf("/")+ 1);
@@ -207,7 +226,6 @@ public class MyService extends Service {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     private void createNotificationChannel() {
@@ -224,7 +242,6 @@ public class MyService extends Service {
     }
 
     public void prepareMediaPlayerPreviousNext() {
-
         //mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
@@ -292,7 +309,6 @@ public class MyService extends Service {
         super.onDestroy();
     }
 
-
     public void prepareMediaPlayer() {
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
@@ -301,7 +317,6 @@ public class MyService extends Service {
             mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
                     .setLegacyStreamType(AudioManager.STREAM_MUSIC)
                     .build());
-
         try {
             mediaPlayer.setDataSource(url);
             mediaPlayer.prepare();
@@ -311,7 +326,6 @@ public class MyService extends Service {
             e.printStackTrace();
         }
     }
-
     public void inputRadioStations() {
 
         RadioStation radio1 = new RadioStation("Naxi Radio", "https://naxi128.streaming.rs:9152/;*.mp3");
@@ -322,6 +336,9 @@ public class MyService extends Service {
         RadioStation radio6 = new RadioStation("Fruska Gora", "https://player.iradio.pro/radiofruskagora/");
         RadioStation radio7 = new RadioStation("Pingvin", "https://uzivo.radiopingvin.com/domaci1");
         RadioStation radio8 = new RadioStation("Radio Zelengrad", "https://usa5.fastcast4u.com/proxy/pddonlcc?mp=/1");
+        RadioStation radio9 = new RadioStation("TDI", "https://streaming.tdiradio.com/tdiradio.mp3");
+        RadioStation radio10 = new RadioStation("Ok Radio", "https://sslstream.okradio.net/;*.mp3");
+        RadioStation radio11 = new RadioStation("Radio JAT", "https://streaming.radiojat.rs/radiojat.mp3");
 
         radioList.add(radio1);
         radioList.add(radio2);
@@ -331,6 +348,11 @@ public class MyService extends Service {
         radioList.add(radio6);
         radioList.add(radio7);
         radioList.add(radio8);
+        radioList.add(radio9);
+        radioList.add(radio10);
+        radioList.add(radio11);
+
+
     }
 
     @Nullable
