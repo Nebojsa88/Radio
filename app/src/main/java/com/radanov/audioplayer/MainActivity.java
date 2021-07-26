@@ -92,8 +92,6 @@ public class MainActivity extends AppCompatActivity{
 
                 //textRadioName.setText(radioList.get(position).getName());
 
-
-
                 myService.prepareMediaPlayerPrevious();
                 /*Intent serviceIntent = new Intent(MainActivity.this, MyService.class);
                 serviceIntent.putExtra("isPrevious", isPrevious);

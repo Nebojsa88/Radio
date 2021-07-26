@@ -39,8 +39,7 @@ public class MyService extends Service {
     private boolean prepared = false;
     private boolean started = false;
     private String filePath;
-    private int source;
-    Context context;
+    private Context context;
     private String url;
     private String radioName;
     int position;
@@ -52,21 +51,19 @@ public class MyService extends Service {
     public void onCreate() {
         super.onCreate();
         createNotificationChannel();
-        inputRadioStations();
-
+        if(radioList.size() < 1){
+            inputRadioStations();
+        }
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         started = intent.getBooleanExtra("isStarted", false);
-        source = intent.getIntExtra("source", 0);
+
         filePath = intent.getStringExtra("filePath");
         url = intent.getStringExtra("url");
         position = intent.getIntExtra("position", 0);
-
-        isPrevious = intent.getBooleanExtra("isPrevious", false);
-        isNext = intent.getBooleanExtra("isNext", false);
 
         radioName = intent.getStringExtra("positionName");
 
@@ -77,13 +74,10 @@ public class MyService extends Service {
         if (started) {
             started = false;
             mediaPlayer.pause();
-            //btnLiveMusic.setText("PLAY");
 
         } else {
             started = true;
             mediaPlayer.start();
-
-            //btnLiveMusic.setText("Pause");
         }
 
         Intent intent1 = new Intent(this, MainActivity.class);
@@ -105,16 +99,16 @@ public class MyService extends Service {
             inputRadioStations();
         }
 
-        //mediaPlayer = new MediaPlayer();
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        else
+        }
+        else{
             mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
                     .setLegacyStreamType(AudioManager.STREAM_MUSIC)
                     .build());
+        }
         mediaPlayer.reset();
 
-        //prepareMediaPlayerPrevious();
         try {
 
             mediaPlayer.setDataSource(radioList.get(MusicAdapter.TEST_POSITION).getUrl());
@@ -128,12 +122,9 @@ public class MyService extends Service {
 
             //textViewFileNameMusic.clearAnimation();
             //textViewFileNameMusic.startAnimation(animation);
-
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
 
     public void prepareMediaPlayerNext() {
