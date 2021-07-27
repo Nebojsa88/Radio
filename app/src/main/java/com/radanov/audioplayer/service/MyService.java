@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
@@ -18,9 +19,17 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.ProgressiveMediaSource;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
 import com.radanov.audioplayer.MainActivity;
 import com.radanov.audioplayer.R;
 import com.radanov.audioplayer.adapters.MusicAdapter;
@@ -28,6 +37,11 @@ import com.radanov.audioplayer.model.RadioStation;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
@@ -45,6 +59,7 @@ public class MyService extends Service {
     private String url;
     private String radioName;
     int position;
+    //private SimpleExoPlayer simpleExoPlayer;
 
     @Override
     public void onCreate() {
@@ -68,7 +83,6 @@ public class MyService extends Service {
         sendMessageToActivity(radioName);
 
         prepareMediaPlayerPosition();
-
         /*if (started) {
             started = false;
             mediaPlayer.pause();
@@ -77,7 +91,6 @@ public class MyService extends Service {
             started = true;
             mediaPlayer.start();
         }*/
-
         Intent intent1 = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent1, 0);
 
@@ -92,11 +105,26 @@ public class MyService extends Service {
         return START_STICKY;
     }
 
+
     public void prepareMediaPlayerPosition() {
+        trustManager();
         if(radioList.size() < 1){
             inputRadioStations();
         }
+        /*if(simpleExoPlayer == null){
+            simpleExoPlayer = new SimpleExoPlayer.Builder(getApplication()).build();
+        }
+
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this,
+                Util.getUserAgent(this, "Audio Player"));
+
+        MediaSource audioSource = new ProgressiveMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(Uri.parse(radioList.get(MusicAdapter.TEST_POSITION).getUrl()));
+
+        simpleExoPlayer.prepare(audioSource);
+        simpleExoPlayer.setPlayWhenReady(true);*/
         mediaPlayer = StreamMediaPlayer.getInstance();
+
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         }else {
@@ -111,12 +139,17 @@ public class MyService extends Service {
         try {
             mediaPlayer.setDataSource(radioList.get(MusicAdapter.TEST_POSITION).getUrl());
             mediaPlayer.prepareAsync();
+
+
+
             mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
                     mediaPlayer.start();
                 }
             });
+
+
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
@@ -311,6 +344,30 @@ public class MyService extends Service {
 
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void trustManager(){
+        TrustManager[] trustAllCerts = new TrustManager[]{
+                new X509TrustManager() {
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        return null;
+                    }
+                    public void checkClientTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {
+                    }
+                    public void checkServerTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {
+                    }
+                }
+        };
+        // Install the all-trusting trust manager
+        // Try "SSL" or Replace with "TLS"
+        try {
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        } catch (Exception e) {
         }
     }
     public void inputRadioStations() {

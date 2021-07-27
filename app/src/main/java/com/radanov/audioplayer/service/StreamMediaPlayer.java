@@ -16,7 +16,6 @@ public class StreamMediaPlayer extends MediaPlayer {
         }
         return mediaPlayer;
     }
-
     @Override
     public void release() {
         super.release();

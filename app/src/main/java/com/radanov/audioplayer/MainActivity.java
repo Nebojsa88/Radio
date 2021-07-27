@@ -228,13 +228,13 @@ public class MainActivity extends AppCompatActivity{
 
         RadioStation radio1 = new RadioStation("Naxi Radio", "https://naxi128.streaming.rs:9152/;*.mp3");
         RadioStation radio2 = new RadioStation("Rock Radio", "https://mastermedia.shoutca.st/proxy/rockradio?mp=/stream");
-        RadioStation radio3 = new RadioStation("Play Radio", "https://stream.playradio.rs:8443/play.mp3");
+        RadioStation radio3 = new RadioStation("Play Radio", "https://stream.playradio.rs:8443/play-low.aac");
         RadioStation radio4 = new RadioStation("Delta Radio", "https://radio.dukahosting.com:7015/;*.mp3");
         RadioStation radio5 = new RadioStation("As", "https://mastermedia.shoutca.st/proxy/radioasfm?mp=/stream");
         RadioStation radio6 = new RadioStation("Fruska Gora", "https://player.iradio.pro/radiofruskagora/");
         RadioStation radio7 = new RadioStation("Pingvin", "https://uzivo.radiopingvin.com/domaci1");
         RadioStation radio8 = new RadioStation("Radio Zelengrad", "https://usa5.fastcast4u.com/proxy/pddonlcc?mp=/1");
-        RadioStation radio9 = new RadioStation("TDI", "https://streaming.tdiradio.com/tdiradionovisad.mp3");
+        RadioStation radio9 = new RadioStation("TDI", "https://streaming.tdiradio.com/tdiradionovisad.aac");
         RadioStation radio10 = new RadioStation("Ok Radio", "https://sslstream.okradio.net/;*.mp3");
         RadioStation radio11 = new RadioStation("Radio JAT", "https://streaming.radiojat.rs/radiojat.mp3");
         RadioStation radio12 = new RadioStation("Cool", "https://live.coolradio.rs/cool128");
