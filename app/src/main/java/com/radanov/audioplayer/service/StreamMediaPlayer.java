@@ -7,7 +7,6 @@ public class StreamMediaPlayer extends MediaPlayer {
     private static StreamMediaPlayer mediaPlayer;
 
     private StreamMediaPlayer() {
-
     }
 
     public static StreamMediaPlayer getInstance() {

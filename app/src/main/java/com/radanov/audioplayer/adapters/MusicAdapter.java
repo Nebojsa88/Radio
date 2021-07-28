@@ -3,6 +3,7 @@ package com.radanov.audioplayer.adapters;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,12 @@ import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.ProgressiveMediaSource;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
 import com.radanov.audioplayer.MainActivity;
 import com.radanov.audioplayer.R;
 import com.radanov.audioplayer.model.RadioStation;
@@ -26,10 +33,12 @@ import java.util.ArrayList;
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHolder>{
 
     private ArrayList<RadioStation> radioStations;
-    private Context mContext;
+    public static Context mContext;
     private String radioName;
     public static int TEST_POSITION;
     private boolean serviceStarted;
+    private SimpleExoPlayer simpleExoPlayer;
+    MyService myService;
 
     public MusicAdapter(ArrayList<RadioStation> list, Context mContext) {
         this.radioStations = list;
@@ -56,17 +65,12 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
                     name.setText(radioStations.get(position).getName());
 
                     TEST_POSITION = position;
-                    MyService myService = new MyService();
 
                     if (isMyServiceRunning(MyService.class)) {
                         myService.prepareMediaPlayerPosition();
-                    /*Intent intent = new Intent("send_radio_name");
-                    // You can also include some extra data.
-                    intent.putExtra("radioPosition", position);
-
-                    LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);*/
                         serviceStarted = false;
                     } else {
+                        myService = new MyService();
                         startForegroundService(position);
                         serviceStarted = true;
                     }

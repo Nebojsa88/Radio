@@ -23,6 +23,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -55,11 +56,11 @@ public class MyService extends Service {
     private boolean prepared = false;
     private boolean started = false;
     private String filePath;
-    private Context context;
+    public static Context context;
     private String url;
     private String radioName;
     int position;
-    //private SimpleExoPlayer simpleExoPlayer;
+    private StreamExoPlayer exoPlayer;
 
     @Override
     public void onCreate() {
@@ -107,23 +108,23 @@ public class MyService extends Service {
 
 
     public void prepareMediaPlayerPosition() {
+
         trustManager();
         if(radioList.size() < 1){
             inputRadioStations();
         }
-        /*if(simpleExoPlayer == null){
-            simpleExoPlayer = new SimpleExoPlayer.Builder(getApplication()).build();
-        }
 
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this,
-                Util.getUserAgent(this, "Audio Player"));
+        exoPlayer = StreamExoPlayer.getInstance(MusicAdapter.mContext);
+
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(MusicAdapter.mContext,
+                Util.getUserAgent(MusicAdapter.mContext, "Audio Player"));
 
         MediaSource audioSource = new ProgressiveMediaSource.Factory(dataSourceFactory)
                 .createMediaSource(Uri.parse(radioList.get(MusicAdapter.TEST_POSITION).getUrl()));
 
-        simpleExoPlayer.prepare(audioSource);
-        simpleExoPlayer.setPlayWhenReady(true);*/
-        mediaPlayer = StreamMediaPlayer.getInstance();
+        exoPlayer.prepare(audioSource);
+        exoPlayer.setPlayWhenReady(true);
+        /*mediaPlayer = StreamMediaPlayer.getInstance();
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -149,18 +150,17 @@ public class MyService extends Service {
                 }
             });
 
-
-        } catch (IOException e) {
+            } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
-        }
+        }*/
 
     }
     public void prepareMediaPlayerNext() {
         if(radioList.size() < 1){
             inputRadioStations();
         }
-        mediaPlayer = StreamMediaPlayer.getInstance();
+        /*mediaPlayer = StreamMediaPlayer.getInstance();
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O){
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         }
@@ -170,16 +170,27 @@ public class MyService extends Service {
                     .setUsage(AudioAttributes.USAGE_MEDIA)
                     .build());
         }
-        mediaPlayer.reset();
-
+        mediaPlayer.reset();*/
         if (MusicAdapter.TEST_POSITION == radioList.size() - 1) {
             MusicAdapter.TEST_POSITION = -1;
         }
         MusicAdapter.TEST_POSITION++;
         String testName = radioList.get(MusicAdapter.TEST_POSITION).getName();
         sendMessageToActivity(testName);
+
+        exoPlayer = StreamExoPlayer.getInstance(MusicAdapter.mContext);
+
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(MusicAdapter.mContext,
+                Util.getUserAgent(MusicAdapter.mContext, "Audio Player"));
+
+        MediaSource audioSource = new ProgressiveMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(Uri.parse(radioList.get(MusicAdapter.TEST_POSITION).getUrl()));
+
+        exoPlayer.prepare(audioSource);
+        exoPlayer.setPlayWhenReady(true);
+
         //prepareMediaPlayerPrevious();
-        try {
+       /* try {
 
             mediaPlayer.setDataSource(radioList.get(MusicAdapter.TEST_POSITION).getUrl());
             mediaPlayer.prepareAsync();
@@ -200,14 +211,14 @@ public class MyService extends Service {
 
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
     }
     public void prepareMediaPlayerPrevious() {
         if(radioList.size() < 1){
             inputRadioStations();
         }
-        mediaPlayer = StreamMediaPlayer.getInstance();
+        /*mediaPlayer = StreamMediaPlayer.getInstance();
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         }else {
@@ -216,7 +227,7 @@ public class MyService extends Service {
                     .setUsage(AudioAttributes.USAGE_MEDIA)
                     .build());
         }
-        mediaPlayer.reset();
+        mediaPlayer.reset();*/
 
         if (MusicAdapter.TEST_POSITION == 0) {
             MusicAdapter.TEST_POSITION = radioList.size();
@@ -225,7 +236,18 @@ public class MyService extends Service {
         String testName = radioList.get(MusicAdapter.TEST_POSITION).getName();
         sendMessageToActivity(testName);
 
-        try {
+        exoPlayer = StreamExoPlayer.getInstance(MusicAdapter.mContext);
+
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(MusicAdapter.mContext,
+                Util.getUserAgent(MusicAdapter.mContext, "Audio Player"));
+
+        MediaSource audioSource = new ProgressiveMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(Uri.parse(radioList.get(MusicAdapter.TEST_POSITION).getUrl()));
+
+        exoPlayer.prepare(audioSource);
+        exoPlayer.setPlayWhenReady(true);
+
+        /*try {
 
             mediaPlayer.setDataSource(radioList.get(MusicAdapter.TEST_POSITION).getUrl());
             mediaPlayer.prepareAsync();
@@ -245,7 +267,7 @@ public class MyService extends Service {
 
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     private void createNotificationChannel() {
@@ -322,8 +344,8 @@ public class MyService extends Service {
     }*/
     @Override
     public void onDestroy() {
-        mediaPlayer.stop();
-        mediaPlayer.release();
+        exoPlayer.stop();
+        exoPlayer.release();
         stopForeground(true);
         stopSelf();
         super.onDestroy();
