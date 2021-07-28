@@ -52,12 +52,9 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 public class MyService extends Service {
 
     private final ArrayList<RadioStation> radioList = new ArrayList<>();
-    private StreamMediaPlayer mediaPlayer = StreamMediaPlayer.getInstance();
-    private boolean prepared = false;
-    private boolean started = false;
-    private String filePath;
+    //private StreamMediaPlayer mediaPlayer = StreamMediaPlayer.getInstance();
+    //private String filePath;
     public static Context context;
-    private String url;
     private String radioName;
     int position;
     private StreamExoPlayer exoPlayer;
@@ -73,25 +70,13 @@ public class MyService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        started = intent.getBooleanExtra("isStarted", false);
-
-        filePath = intent.getStringExtra("filePath");
-        url = intent.getStringExtra("url");
-        position = intent.getIntExtra("position", 0);
-
+        //filePath = intent.getStringExtra("filePath");
         radioName = intent.getStringExtra("positionName");
 
         sendMessageToActivity(radioName);
 
         prepareMediaPlayerPosition();
-        /*if (started) {
-            started = false;
-            mediaPlayer.pause();
 
-        } else {
-            started = true;
-            mediaPlayer.start();
-        }*/
         Intent intent1 = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent1, 0);
 
@@ -246,10 +231,9 @@ public class MyService extends Service {
 
         exoPlayer.prepare(audioSource);
         exoPlayer.setPlayWhenReady(true);
-
         /*try {
 
-            mediaPlayer.setDataSource(radioList.get(MusicAdapter.TEST_POSITION).getUrl());
+             mediaPlayer.setDataSource(radioList.get(MusicAdapter.TEST_POSITION).getUrl());
             mediaPlayer.prepareAsync();
             mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
@@ -281,32 +265,6 @@ public class MyService extends Service {
             manager.createNotificationChannel(notificationChannel);
         }
 
-    }
-
-    public void prepareMediaPlayerPreviousNext() {
-        //mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
-        position = MusicAdapter.TEST_POSITION;
-
-        String previousUrl = radioList.get(position).getUrl();
-
-        try {
-            mediaPlayer.setDataSource(previousUrl);
-            mediaPlayer.prepare();
-            mediaPlayer.start();
-
-            //buttonPlayPause.setBackgroundResource(R.drawable.pause);
-
-            //String newTitle = newFilePath.substring(newFilePath.lastIndexOf("/")+ 1);
-            //textViewFileNameMusic.setText(newTitle);
-
-            //textViewFileNameMusic.clearAnimation();
-            //textViewFileNameMusic.startAnimation(animation);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public void sendMessageToActivity(String msg) {
@@ -349,24 +307,6 @@ public class MyService extends Service {
         stopForeground(true);
         stopSelf();
         super.onDestroy();
-    }
-
-    public void prepareMediaPlayer() {
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
-            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        else
-            mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
-                    .setLegacyStreamType(AudioManager.STREAM_MUSIC)
-                    .build());
-        try {
-            mediaPlayer.setDataSource(url);
-            mediaPlayer.prepare();
-            prepared = true;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public void trustManager(){
@@ -421,9 +361,7 @@ public class MyService extends Service {
         radioList.add(radio11);
         radioList.add(radio12);
         radioList.add(radio13);
-
     }
-
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {

@@ -36,7 +36,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity{
 
-    Context context;
+
     private int position;
     public static boolean isClickable = true;
     private TextView textRadioName;
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity{
     private final static String MEDIA_PATH = Environment.getExternalStorageDirectory().getPath() + "/";
     private final ArrayList<RadioStation> radioList = new ArrayList<>();
     private MusicAdapter adapter;
-    private int source;
+
 
     private MyService myService = new MyService();
 
@@ -91,17 +91,9 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
 
-                /*if(isMyServiceRunning(MyService.class)){
-                    stopService();
-                }*/
                 position = MusicAdapter.TEST_POSITION;
-
-                //textRadioName.setText(radioList.get(position).getName());
-
                 myService.prepareMediaPlayerPrevious();
-                /*Intent serviceIntent = new Intent(MainActivity.this, MyService.class);
-                serviceIntent.putExtra("isPrevious", isPrevious);
-                ContextCompat.startForegroundService(MainActivity.this, serviceIntent);*/
+
 
             }
         });
@@ -258,20 +250,13 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void stopService() {
-
-        // Boolean isStarted = started;
         Intent serviceIntent = new Intent(this, MyService.class);
-        //serviceIntent.putExtra("isStarted", isStarted);
         stopService(serviceIntent);
 
     }
     public void startService() {
-        source = 1;
 
-        //Boolean isStarted = started;
         Intent serviceIntent = new Intent(this, MyService.class);
-
-        serviceIntent.putExtra("source", source);
 
         ContextCompat.startForegroundService(this, serviceIntent);
     }

@@ -36,8 +36,6 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
     public static Context mContext;
     private String radioName;
     public static int TEST_POSITION;
-    private boolean serviceStarted;
-    private SimpleExoPlayer simpleExoPlayer;
     MyService myService;
 
     public MusicAdapter(ArrayList<RadioStation> list, Context mContext) {
@@ -68,11 +66,11 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
 
                     if (isMyServiceRunning(MyService.class)) {
                         myService.prepareMediaPlayerPosition();
-                        serviceStarted = false;
+
                     } else {
                         myService = new MyService();
                         startForegroundService(position);
-                        serviceStarted = true;
+
                     }
                 }else{
                     Toast.makeText(mContext, "Please check your internet !", Toast.LENGTH_SHORT).show();
