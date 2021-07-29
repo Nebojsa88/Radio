@@ -16,7 +16,6 @@ public class StreamExoPlayer extends SimpleExoPlayer {
     public static StreamExoPlayer getInstance(Context context) {
         if(exoPlayer == null) {
             exoPlayer = new StreamExoPlayer(new SimpleExoPlayer.Builder(context));
-
         }
         return exoPlayer;
     }

@@ -52,7 +52,6 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 public class MyService extends Service {
 
     private final ArrayList<RadioStation> radioList = new ArrayList<>();
-    //private StreamMediaPlayer mediaPlayer = StreamMediaPlayer.getInstance();
     //private String filePath;
     public static Context context;
     private String radioName;
@@ -98,7 +97,6 @@ public class MyService extends Service {
         if(radioList.size() < 1){
             inputRadioStations();
         }
-
         exoPlayer = StreamExoPlayer.getInstance(MusicAdapter.mContext);
 
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(MusicAdapter.mContext,
@@ -128,7 +126,7 @@ public class MyService extends Service {
 
 
 
-            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
                     mediaPlayer.start();

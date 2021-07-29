@@ -36,7 +36,6 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity{
 
-
     private int position;
     public static boolean isClickable = true;
     private TextView textRadioName;
@@ -49,9 +48,7 @@ public class MainActivity extends AppCompatActivity{
     private final ArrayList<RadioStation> radioList = new ArrayList<>();
     private MusicAdapter adapter;
 
-
     private MyService myService = new MyService();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +90,6 @@ public class MainActivity extends AppCompatActivity{
 
                 position = MusicAdapter.TEST_POSITION;
                 myService.prepareMediaPlayerPrevious();
-
 
             }
         });
@@ -142,7 +138,6 @@ public class MainActivity extends AppCompatActivity{
             //getAllAudioFiles();
         }
     }
-
     private void getAllAudioFilesTest() {
         if (Environment.isExternalStorageEmulated()) {
 
@@ -150,7 +145,6 @@ public class MainActivity extends AppCompatActivity{
 
         }
     }
-
     BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -161,7 +155,6 @@ public class MainActivity extends AppCompatActivity{
             textRadioName.setText(radioName);
         }
     };
-
     public void setRecyclerView(){
 
         recyclerView = findViewById(R.id.recyclerView);
@@ -246,18 +239,13 @@ public class MainActivity extends AppCompatActivity{
         radioList.add(radio11);
         radioList.add(radio12);
         radioList.add(radio13);
-
     }
-
     public void stopService() {
         Intent serviceIntent = new Intent(this, MyService.class);
         stopService(serviceIntent);
-
     }
     public void startService() {
-
         Intent serviceIntent = new Intent(this, MyService.class);
-
         ContextCompat.startForegroundService(this, serviceIntent);
     }
 
@@ -327,12 +315,10 @@ public class MainActivity extends AppCompatActivity{
         super.onPause();
 
     }
-
     @Override
     protected void onResume() {
         super.onResume();
     }
-
     @Override
     protected void onDestroy() {
         stopService();

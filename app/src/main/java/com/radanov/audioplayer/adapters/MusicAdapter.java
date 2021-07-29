@@ -1,5 +1,6 @@
 package com.radanov.audioplayer.adapters;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -51,7 +52,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
         return new MusicViewHolder(view);
     }
     @Override
-    public void onBindViewHolder(@NonNull MusicAdapter.MusicViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MusicAdapter.MusicViewHolder holder, @SuppressLint("RecyclerView") int position) {
 
         holder.textViewFileName.setText(radioStations.get(position).getName());
         holder.cardView.setOnClickListener(new View.OnClickListener() {
@@ -70,7 +71,6 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
                     } else {
                         myService = new MyService();
                         startForegroundService(position);
-
                     }
                 }else{
                     Toast.makeText(mContext, "Please check your internet !", Toast.LENGTH_SHORT).show();
