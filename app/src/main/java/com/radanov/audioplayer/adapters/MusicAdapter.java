@@ -96,7 +96,6 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
             }
         });*/
     }
-
     private void startForegroundService(int position) {
         Intent serviceIntent = new Intent(mContext, MyService.class);
         String urlPosition;

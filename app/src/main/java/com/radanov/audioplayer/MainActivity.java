@@ -47,7 +47,8 @@ public class MainActivity extends AppCompatActivity{
     private final static String MEDIA_PATH = Environment.getExternalStorageDirectory().getPath() + "/";
     private final ArrayList<RadioStation> radioList = new ArrayList<>();
     private MusicAdapter adapter;
-
+    private Button btnRefresh;
+    private TextView textInternet;
     private MyService myService = new MyService();
 
     @Override
@@ -57,7 +58,13 @@ public class MainActivity extends AppCompatActivity{
 
         checkTheme();
 
+        if (!haveNetworkConnection() && isMyServiceRunning(MyService.class)){
+            stopService();
+        }
+
         textRadioName = findViewById(R.id.textRadioName);
+        btnRefresh = findViewById(R.id.buttonRefresh);
+        textInternet = findViewById(R.id.textInternet);
 
         inputRadioStations();
         textRadioName.setText(radioList.get(MusicAdapter.TEST_POSITION).getName());
@@ -70,6 +77,9 @@ public class MainActivity extends AppCompatActivity{
         btnPrevious = (Button) findViewById(R.id.buttonPrevious);
         btnNext = (Button) findViewById(R.id.buttonNext);
 
+        btnRefresh.setVisibility(View.GONE);
+        textInternet.setVisibility(View.GONE);
+
         if (isMyServiceRunning(MyService.class)){
 
             btnLiveMusic.setEnabled(true);
@@ -79,17 +89,23 @@ public class MainActivity extends AppCompatActivity{
         }
         btnLiveMusic.setText("Stop");
 
-        if (!haveNetworkConnection()) {
-            btnLiveMusic.setEnabled(false);
-            isClickable = false;
-            Toast.makeText(this, "Please check internet connection", Toast.LENGTH_SHORT).show();
-        }
+        isClickable = true;
+
         btnPrevious.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (!isMyServiceRunning(MyService.class)){
+                    Toast.makeText(MainActivity.this, "Please select radio station from list !", Toast.LENGTH_SHORT).show();
 
-                position = MusicAdapter.TEST_POSITION;
-                myService.prepareMediaPlayerPrevious();
+                }else{
+                    if (haveNetworkConnection() && isMyServiceRunning(MyService.class)){
+                        position = MusicAdapter.TEST_POSITION;
+                        myService.prepareMediaPlayerPrevious();
+                    }else{
+                        btnPrevious.setEnabled(false);
+                        Toast.makeText(MainActivity.this, "Please check your internet !", Toast.LENGTH_SHORT).show();
+                    }
+                }
 
             }
         });
@@ -98,8 +114,20 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
 
-                position = MusicAdapter.TEST_POSITION;
-                myService.prepareMediaPlayerNext();
+                if (!isMyServiceRunning(MyService.class)){
+                    Toast.makeText(MainActivity.this, "Please select radio station from list !", Toast.LENGTH_SHORT).show();
+
+                }else {
+                    if (haveNetworkConnection()){
+                        position = MusicAdapter.TEST_POSITION;
+                        myService.prepareMediaPlayerNext();
+                    }else{
+                        btnNext.setEnabled(false);
+                        Toast.makeText(MainActivity.this, "Please check your internet !", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+
 
             }
         });
@@ -155,6 +183,7 @@ public class MainActivity extends AppCompatActivity{
             textRadioName.setText(radioName);
         }
     };
+
     public void setRecyclerView(){
 
         recyclerView = findViewById(R.id.recyclerView);
@@ -312,17 +341,59 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     protected void onPause() {
+        if (!haveNetworkConnection() && isMyServiceRunning(MyService.class)){
+            stopService();
+        }
+        if (!haveNetworkConnection()) {
+            btnLiveMusic.setEnabled(false);
+            btnNext.setEnabled(false);
+            btnPrevious.setEnabled(false);
+            isClickable = false;
+            btnRefresh.setVisibility(View.VISIBLE);
+            textInternet.setVisibility(View.VISIBLE);
+        }else{
+            btnLiveMusic.setEnabled(true);
+            btnNext.setEnabled(true);
+            btnPrevious.setEnabled(true);
+            isClickable = true;
+        }
         super.onPause();
+
+    }
+    public void refreshActivity(){
+        Intent intent = getIntent();
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        finish();
+        startActivity(intent);
 
     }
     @Override
     protected void onResume() {
+        if (!haveNetworkConnection()) {
+            btnLiveMusic.setEnabled(false);
+            btnNext.setEnabled(false);
+            btnPrevious.setEnabled(false);
+            isClickable = false;
+            Toast.makeText(this, "Please check internet connection", Toast.LENGTH_SHORT).show();
+            textInternet.setVisibility(View.VISIBLE);
+            btnRefresh.setVisibility(View.VISIBLE);
+            btnRefresh.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    refreshActivity();
+                }
+            });
+
+        }else{
+            textInternet.setVisibility(View.GONE);
+            btnRefresh.setVisibility(View.GONE);
+        }
         super.onResume();
     }
     @Override
     protected void onDestroy() {
         stopService();
-        unregisterReceiver(mMessageReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
         super.onDestroy();
 
     }
