@@ -56,26 +56,29 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        inputRadioStations();
         checkTheme();
-
-        if (!haveNetworkConnection() && isMyServiceRunning(MyService.class)){
-            stopService();
-        }
-
         textRadioName = findViewById(R.id.textRadioName);
         btnRefresh = findViewById(R.id.buttonRefresh);
         textInternet = findViewById(R.id.textInternet);
 
-        inputRadioStations();
-        textRadioName.setText(radioList.get(MusicAdapter.TEST_POSITION).getName());
-        setRecyclerView();
-
-        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(
-                mMessageReceiver, new IntentFilter("send_radio_name"));
-
         btnLiveMusic = (Button) findViewById(R.id.btnLiveMusic);
         btnPrevious = (Button) findViewById(R.id.buttonPrevious);
         btnNext = (Button) findViewById(R.id.buttonNext);
+
+       if(isMyServiceRunning(MyService.class)){
+
+           textRadioName.setText(radioList.get(MusicAdapter.TEST_POSITION).getName());
+       }
+        if (!haveNetworkConnection() && isMyServiceRunning(MyService.class)){
+            stopService();
+            textRadioName.setText("");
+
+        }
+
+        setRecyclerView();
+        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(
+                mMessageReceiver, new IntentFilter("send_radio_name"));
 
         btnRefresh.setVisibility(View.GONE);
         textInternet.setVisibility(View.GONE);

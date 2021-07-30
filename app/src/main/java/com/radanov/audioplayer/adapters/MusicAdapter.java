@@ -64,12 +64,12 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
                     name.setText(radioStations.get(position).getName());
 
                     TEST_POSITION = position;
-
+                    myService = new MyService();
                     if (isMyServiceRunning(MyService.class)) {
                         myService.prepareMediaPlayerPosition();
 
                     } else {
-                        myService = new MyService();
+
                         startForegroundService(position);
                     }
                 }else{
