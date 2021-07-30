@@ -77,6 +77,10 @@ public class MyService extends Service {
         prepareMediaPlayerPosition();
 
         Intent intent1 = new Intent(this, MainActivity.class);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB && Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN ){
+            intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
+
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent1, 0);
 
         Notification notification = new NotificationCompat.Builder(this, "ChannelID1")
@@ -89,6 +93,8 @@ public class MyService extends Service {
 
         return START_STICKY;
     }
+
+
 
 
     public void prepareMediaPlayerPosition() {
@@ -265,6 +271,7 @@ public class MyService extends Service {
 
     }
 
+
     public void sendMessageToActivity(String msg) {
         Intent intent = new Intent("send_radio_name");
         // You can also include some extra data.
@@ -345,7 +352,13 @@ public class MyService extends Service {
         RadioStation radio11 = new RadioStation("Radio JAT", "https://streaming.radiojat.rs/radiojat.mp3");
         RadioStation radio12 = new RadioStation("Cool", "https://live.coolradio.rs/cool128");
         RadioStation radio13 = new RadioStation("Radio In", "https://radio3-64ssl.streaming.rs:9212/;*.mp3");
-
+        RadioStation radio14 = new RadioStation("Radio S", "https://stream.radios.rs:9000/;*.mp3");
+        RadioStation radio15 = new RadioStation("Nostalgija", "https://nostalgie64ssl.streaming.rs:9262/;*.mp3");
+        RadioStation radio16 = new RadioStation("Karolina", "https://streaming.karolina.rs/karolina.mp3");
+        RadioStation radio17 = new RadioStation("Moj Radio", "https://eu4.fastcast4u.com/proxy/svidakov?mp=/1");
+        RadioStation radio18 = new RadioStation("Hit Radio", "https://streaming.hitfm.rs/hit.mp3");
+        RadioStation radio19 = new RadioStation("Laguna", "https://live.radiolaguna.rs/laguna");
+        RadioStation radio20 = new RadioStation("Top Fm", "https://topfm64ssl.streaming.rs:9287/;*.mp3");
         radioList.add(radio1);
         radioList.add(radio2);
         radioList.add(radio3);
@@ -359,6 +372,13 @@ public class MyService extends Service {
         radioList.add(radio11);
         radioList.add(radio12);
         radioList.add(radio13);
+        radioList.add(radio14);
+        radioList.add(radio15);
+        radioList.add(radio16);
+        radioList.add(radio17);
+        radioList.add(radio18);
+        radioList.add(radio19);
+        radioList.add(radio20);
     }
     @Nullable
     @Override

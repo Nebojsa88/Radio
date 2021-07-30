@@ -67,9 +67,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
                     myService = new MyService();
                     if (isMyServiceRunning(MyService.class)) {
                         myService.prepareMediaPlayerPosition();
-
                     } else {
-
                         startForegroundService(position);
                     }
                 }else{

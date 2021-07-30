@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity{
     private Button btnPrevious;
     private Button btnNext;
     private RecyclerView recyclerView;
-    private final static String MEDIA_PATH = Environment.getExternalStorageDirectory().getPath() + "/";
+    //private final static String MEDIA_PATH = Environment.getExternalStorageDirectory().getPath() + "/";
     private final ArrayList<RadioStation> radioList = new ArrayList<>();
     private MusicAdapter adapter;
     private Button btnRefresh;
@@ -129,9 +129,6 @@ public class MainActivity extends AppCompatActivity{
                         Toast.makeText(MainActivity.this, "Please check your internet !", Toast.LENGTH_SHORT).show();
                     }
                 }
-
-
-
             }
         });
 
@@ -157,7 +154,7 @@ public class MainActivity extends AppCompatActivity{
                     btnLiveMusic.setText("Pause");
                 }*/
         });
-        Log.e("Media path", MEDIA_PATH);
+        //Log.e("Media path", MEDIA_PATH);
 
         if (ContextCompat.checkSelfPermission(MainActivity.this,
                 Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -176,6 +173,8 @@ public class MainActivity extends AppCompatActivity{
 
         }
     }
+
+
     BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -257,6 +256,13 @@ public class MainActivity extends AppCompatActivity{
         RadioStation radio11 = new RadioStation("Radio JAT", "https://streaming.radiojat.rs/radiojat.mp3");
         RadioStation radio12 = new RadioStation("Cool", "https://live.coolradio.rs/cool128");
         RadioStation radio13 = new RadioStation("Radio In", "https://radio3-64ssl.streaming.rs:9212/;*.mp3");
+        RadioStation radio14 = new RadioStation("Radio S", "https://stream.radios.rs:9000/;*.mp3");
+        RadioStation radio15 = new RadioStation("Nostalgija", "https://nostalgie64ssl.streaming.rs:9262/;*.mp3");
+        RadioStation radio16 = new RadioStation("Karolina", "https://streaming.karolina.rs/karolina.mp3");
+        RadioStation radio17 = new RadioStation("Moj Radio", "https://eu4.fastcast4u.com/proxy/svidakov?mp=/1");
+        RadioStation radio18 = new RadioStation("Hit Radio", "https://streaming.hitfm.rs/hit.mp3");
+        RadioStation radio19 = new RadioStation("Laguna", "https://live.radiolaguna.rs/laguna");
+        RadioStation radio20 = new RadioStation("Top Fm", "https://topfm64ssl.streaming.rs:9287/;*.mp3");
 
         radioList.add(radio1);
         radioList.add(radio2);
@@ -271,6 +277,13 @@ public class MainActivity extends AppCompatActivity{
         radioList.add(radio11);
         radioList.add(radio12);
         radioList.add(radio13);
+        radioList.add(radio14);
+        radioList.add(radio15);
+        radioList.add(radio16);
+        radioList.add(radio17);
+        radioList.add(radio18);
+        radioList.add(radio19);
+        radioList.add(radio20);
     }
     public void stopService() {
         Intent serviceIntent = new Intent(this, MyService.class);
@@ -320,6 +333,15 @@ public class MainActivity extends AppCompatActivity{
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
+            finishAffinity();
+        }
+        finish();
+
     }
 
     @Override
@@ -373,18 +395,20 @@ public class MainActivity extends AppCompatActivity{
     @Override
     protected void onResume() {
         if (!haveNetworkConnection()) {
+            if (isMyServiceRunning(MyService.class)){
+                stopService();
+            }
             btnLiveMusic.setEnabled(false);
             btnNext.setEnabled(false);
             btnPrevious.setEnabled(false);
             isClickable = false;
+            textRadioName.setText("");
             Toast.makeText(this, "Please check internet connection", Toast.LENGTH_SHORT).show();
             textInternet.setVisibility(View.VISIBLE);
             btnRefresh.setVisibility(View.VISIBLE);
-            btnRefresh.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    refreshActivity();
-                }
+            stopService();
+            btnRefresh.setOnClickListener(v -> {
+                refreshActivity();
             });
 
         }else{
@@ -393,6 +417,8 @@ public class MainActivity extends AppCompatActivity{
         }
         super.onResume();
     }
+
+
     @Override
     protected void onDestroy() {
         stopService();
