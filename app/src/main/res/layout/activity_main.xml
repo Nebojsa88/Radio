@@ -31,17 +31,6 @@
             android:text="No Internet"
             android:background="@color/red"
             />
-        <Button
-            android:id="@+id/buttonRefresh"
-            android:layout_width="wrap_content"
-            android:layout_height="30sp"
-            android:background="@color/white"
-            android:text="Refresh"
-            android:textSize="10sp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInternet" />
-
         <ImageView
             android:id="@+id/imageViewNote"
             android:layout_width="wrap_content"

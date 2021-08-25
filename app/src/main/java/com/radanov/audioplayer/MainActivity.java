@@ -1,14 +1,5 @@
 package com.radanov.audioplayer;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.Manifest;
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
@@ -21,16 +12,24 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.radanov.audioplayer.adapters.MusicAdapter;
 import com.radanov.audioplayer.model.RadioStation;
 import com.radanov.audioplayer.service.MyService;
+import com.radanov.audioplayer.utils.NetworkUtils;
 
 import java.util.ArrayList;
 
@@ -47,19 +46,69 @@ public class MainActivity extends AppCompatActivity{
     //private final static String MEDIA_PATH = Environment.getExternalStorageDirectory().getPath() + "/";
     private final ArrayList<RadioStation> radioList = new ArrayList<>();
     private MusicAdapter adapter;
-    private Button btnRefresh;
     private TextView textInternet;
     private MyService myService = new MyService();
+
+    private boolean connected;
+    private ConnectivityManager connectivityManager;
+
+
+    private final BroadcastReceiver connectivityReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (connected)
+                return;
+            Bundle extras = intent.getExtras();
+            NetworkInfo networkInfo = null;
+            if (extras != null) {
+                networkInfo = extras.getParcelable("networkInfo");
+            }
+            NetworkInfo.State state = null;
+            if (networkInfo != null) {
+                state = networkInfo.getState();
+            }
+            if (state == NetworkInfo.State.CONNECTED) {
+                textInternet.setVisibility(View.GONE);
+
+                btnNext.setEnabled(true);
+                btnPrevious.setEnabled(true);
+                btnLiveMusic.setEnabled(true);
+                isClickable = true;
+
+            } else {
+                noInternet();
+            }
+        }
+    };
+
+    private void noInternet() {
+        if (!NetworkUtils.hasNetwork(connectivityManager)) {
+            textInternet.setVisibility(View.VISIBLE);
+            btnNext.setEnabled(false);
+            btnPrevious.setEnabled(false);
+            btnLiveMusic.setEnabled(false);
+            isClickable = false;
+            if(isMyServiceRunning(MyService.class)){
+                stopService();
+                textRadioName.setText("");
+            }
+
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getSupportActionBar().setTitle("Radio");
+
+        connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
         inputRadioStations();
         checkTheme();
         textRadioName = findViewById(R.id.textRadioName);
-        btnRefresh = findViewById(R.id.buttonRefresh);
+
         textInternet = findViewById(R.id.textInternet);
 
         btnLiveMusic = (Button) findViewById(R.id.btnLiveMusic);
@@ -80,8 +129,6 @@ public class MainActivity extends AppCompatActivity{
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(
                 mMessageReceiver, new IntentFilter("send_radio_name"));
 
-        btnRefresh.setVisibility(View.GONE);
-        textInternet.setVisibility(View.GONE);
 
         if (isMyServiceRunning(MyService.class)){
 
@@ -162,9 +209,9 @@ public class MainActivity extends AppCompatActivity{
             ActivityCompat.requestPermissions(MainActivity.this,
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
 
-        } else {
+        } /*else {
             //getAllAudioFiles();
-        }
+        }*/
     }
     private void getAllAudioFilesTest() {
         if (Environment.isExternalStorageEmulated()) {
@@ -337,9 +384,7 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     public void onBackPressed() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
-            finishAffinity();
-        }
+        finishAffinity();
         finish();
 
     }
@@ -348,10 +393,10 @@ public class MainActivity extends AppCompatActivity{
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == 1 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        /*if (requestCode == 1 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             //getAllAudioFiles();
 
-        }
+        }*/
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
@@ -369,19 +414,6 @@ public class MainActivity extends AppCompatActivity{
         if (!haveNetworkConnection() && isMyServiceRunning(MyService.class)){
             stopService();
         }
-        if (!haveNetworkConnection()) {
-            btnLiveMusic.setEnabled(false);
-            btnNext.setEnabled(false);
-            btnPrevious.setEnabled(false);
-            isClickable = false;
-            btnRefresh.setVisibility(View.VISIBLE);
-            textInternet.setVisibility(View.VISIBLE);
-        }else{
-            btnLiveMusic.setEnabled(true);
-            btnNext.setEnabled(true);
-            btnPrevious.setEnabled(true);
-            isClickable = true;
-        }
         super.onPause();
 
     }
@@ -394,26 +426,17 @@ public class MainActivity extends AppCompatActivity{
     }
     @Override
     protected void onResume() {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(connectivityReceiver, intentFilter);
         if (!haveNetworkConnection()) {
             if (isMyServiceRunning(MyService.class)){
                 stopService();
             }
-            btnLiveMusic.setEnabled(false);
-            btnNext.setEnabled(false);
-            btnPrevious.setEnabled(false);
-            isClickable = false;
-            textRadioName.setText("");
-            Toast.makeText(this, "Please check internet connection", Toast.LENGTH_SHORT).show();
-            textInternet.setVisibility(View.VISIBLE);
-            btnRefresh.setVisibility(View.VISIBLE);
-            stopService();
-            btnRefresh.setOnClickListener(v -> {
-                refreshActivity();
-            });
+            connected = false;
 
-        }else{
-            textInternet.setVisibility(View.GONE);
-            btnRefresh.setVisibility(View.GONE);
+            Toast.makeText(this, "Please check internet connection", Toast.LENGTH_SHORT).show();
+
         }
         super.onResume();
     }
@@ -422,6 +445,7 @@ public class MainActivity extends AppCompatActivity{
     @Override
     protected void onDestroy() {
         stopService();
+        unregisterReceiver(connectivityReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
         super.onDestroy();
 
